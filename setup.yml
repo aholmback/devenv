@@ -44,7 +44,6 @@
         get_url: url={{ item.url }} dest={{ item.dest }}
         with_items:
             - { url: "https://bootstrap.pypa.io/get-pip.py", dest: "{{ tmpdir }}/", }
-            - { url: "https://tpo.pe/pathogen.vim", dest: "{{ home }}/.vim/bundle/", }
             - { url: "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip", dest: "{{ tmpdir }}/", }
 
       - name: "Install pip"
@@ -69,6 +68,7 @@
             repo: https://github.com/{{ item.account }}/{{ item.name }}.git
             dest: "{{ home }}/.vim/bundle/{{ item.name }}"
         with_items:
+            - { name: vim-pathogen, account: tpope, }
             - { name: nerdtree, account: scrooloose, }
             - { name: vim-sensible, account: tpope, }
             - { name: vim-javascript, account: pangloss, }
