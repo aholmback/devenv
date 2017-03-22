@@ -28,6 +28,8 @@
             - python-dev
             - python3-dev
             - unzip
+            - npm
+            - nodejs-legacy
             - libffi-dev # for building various packages with pip
             - libpq-dev # for building pip's psycopg2
 
@@ -49,6 +51,22 @@
       - name: "Install pip"
         become: yes
         command: "/usr/bin/python {{ tmpdir }}/get-pip.py"
+
+      - name: "Install global pip packages"
+        become: yes
+        pip: name={{ item }}
+        with_items:
+            - ansible
+
+      - name: "Install npm packages"
+        become: yes
+        npm:
+            name: "{{ item }}"
+            global: yes
+            state: latest
+        with_items:
+            - "@frctl/fractal"
+            - "gulp-cli"
 
       - name: "Install ngrok"
         unarchive:
