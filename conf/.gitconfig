@@ -1,0 +1,11 @@
+[alias]
+    co = checkout
+    br = branch
+    ci = commit
+    st = status
+
+[user]
+    name = Alexander Holmbäck
+    email = alexande.holmback@creuna.se
+[core]
+    editor = vim

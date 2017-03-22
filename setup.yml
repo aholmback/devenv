@@ -1,0 +1,80 @@
+---
+- hosts: devenv
+  remote_user: aholmback
+
+  vars:
+      user: aholmback
+      ansible_become_pass: password
+      home: /home/{{ user }}
+      tmpdir: "{{ home }}/tmp"
+
+  tasks:
+
+      - name: "Upgrade system and download package list"
+        become: yes
+        apt:
+            update_cache: true
+            upgrade: dist
+
+      - name: "Install apt packages"
+        become: yes
+        apt: name={{ item }} state=latest
+        with_items:
+            - bash-completion
+            - vim
+            - git
+            - virtualenv
+            - build-essential
+            - python-dev
+            - python3-dev
+            - unzip
+            - libffi-dev # for building various packages with pip
+            - libpq-dev # for building pip's psycopg2
+
+      - name: "Ensure directories exist"
+        file: path={{ item }} state=directory
+        with_items:
+            - "{{ home }}/.vim/bundle"
+            - "{{ home }}/bin"
+            - "{{ home }}/projects"
+            - "{{ tmpdir }}"
+            - "{{ home }}/.ngrok2"
+
+      - name: "Download stuff"
+        get_url: url={{ item.url }} dest={{ item.dest }}
+        with_items:
+            - { url: "https://bootstrap.pypa.io/get-pip.py", dest: "{{ tmpdir }}/", }
+            - { url: "https://tpo.pe/pathogen.vim", dest: "{{ home }}/.vim/bundle/", }
+            - { url: "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip", dest: "{{ tmpdir }}/", }
+
+      - name: "Install pip"
+        become: yes
+        command: "/usr/bin/python {{ tmpdir }}/get-pip.py"
+
+      - name: "Install ngrok"
+        unarchive:
+            src: "{{ tmpdir }}/ngrok-stable-linux-amd64.zip"
+            dest: "{{ home }}/bin/"
+            remote_src: true
+
+      - name: "Copy configuration files"
+        template: src={{ item.src }} dest={{ item.dest }}
+        with_items:
+            - { src: conf/ngrok.yml, dest: "{{ home }}/.ngrok2", }
+            - { src: conf/.vimrc, dest: "{{ home }}/.vimrc", }
+            - { src: conf/.gitconfig, dest: "{{ home }}/.gitconfig", }
+
+      - name: "Install vim plugins"
+        git:
+            repo: https://github.com/{{ item.account }}/{{ item.name }}.git
+            dest: "{{ home }}/.vim/bundle/{{ item.name }}"
+        with_items:
+            - { name: nerdtree, account: scrooloose, }
+            - { name: vim-sensible, account: tpope, }
+            - { name: vim-javascript, account: pangloss, }
+
+      - name: "Copy id_rsa"
+        copy:
+            src: ~/.ssh/id_rsa
+            dest: "{{ home }}/.ssh/id_rsa"
+            mode: 0600
