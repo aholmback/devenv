@@ -1,0 +1,12 @@
+---
+- name: "Install apt packages"
+  become: yes
+  apt: name={{ item }} state=latest
+  with_items:
+    - build-essential
+    - python-dev
+    - python3-dev
+    - libffi-dev
+    - libpq-dev
+
+

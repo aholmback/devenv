@@ -1,0 +1,46 @@
+---
+- name: "Install docker dependencies"
+  become: yes
+  apt: name={{ item }} state=latest
+  with_items:
+    - apt-transport-https
+
+- name: "Add docker repository"
+  become: yes
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu yakkety stable"
+    state: present
+
+- name: "Add docker repository key"
+  become: yes
+  apt_key:
+      id: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
+      url: https://download.docker.com/linux/ubuntu/gpg
+
+- name: "Install docker"
+  become: yes
+  apt: name={{ item }} state=latest
+  with_items:
+    - docker-ce
+
+- name: "Add docker group"
+  become: yes
+  group:
+    name: docker
+    state: present
+
+- name: "Add user {{ user }} to group docker"
+  become: yes
+  user:
+    name: "{{ user }}"
+    groups: docker
+    append: yes
+
+- name: "Restart docker"
+  become: yes
+  service: name=docker state=restarted
+
+- name: "Install docker-compose"
+  get_url: url={{ item.url }} dest={{ item.dest }} mode=0755
+  with_items:
+    - { url: "https://github.com/docker/compose/releases/download/1.11.2/docker-compose-Linux-x86_64", dest: "{{ bindir }}/docker-compose", }

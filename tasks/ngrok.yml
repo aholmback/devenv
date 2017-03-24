@@ -1,0 +1,31 @@
+---
+- name: "Install ngrok dependencies"
+  become: yes
+  apt: name={{ item }} state=latest
+  with_items:
+      - unzip
+
+- name: "Ensure directories exists for ngrok"
+  file: path={{ item }} state=directory
+  with_items:
+      - "{{ home }}/bin"
+      - "{{ tmpdir }}"
+      - "{{ home }}/.ngrok2"
+
+- name: "Download ngrok"
+  get_url: url={{ item.url }} dest={{ item.dest }}
+  with_items:
+    - { url: "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip", dest: "{{ tmpdir }}/", }
+
+- name: "Install ngrok"
+  unarchive:
+      src: "{{ tmpdir }}/ngrok-stable-linux-amd64.zip"
+      dest: "{{ bindir }}"
+      remote_src: yes
+
+- name: "Copy configuration files"
+  template: src={{ item.src }} dest={{ item.dest }}
+  with_items:
+      - { src: conf/ngrok.yml, dest: "{{ home }}/.ngrok2", }
+
+

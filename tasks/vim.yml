@@ -1,0 +1,27 @@
+---
+- name: "Install vim packages"
+  become: yes
+  apt: name={{ item }} state=latest
+  with_items:
+    - vim
+
+- name: "Ensure directories exists for vim"
+  file: path={{ item }} state=directory
+  with_items:
+    - "{{ home }}/.vim/bundle"
+
+- name: "Configure vim"
+  template: src={{ item.src }} dest={{ item.dest }}
+  with_items:
+      - { src: conf/.vimrc, dest: "{{ home }}/.vimrc", }
+
+- name: "Install vim plugins"
+  git:
+      repo: https://github.com/{{ item.account }}/{{ item.name }}.git
+      dest: "{{ home }}/.vim/bundle/{{ item.name }}"
+  with_items:
+      - { name: vim-pathogen, account: tpope, }
+      - { name: nerdtree, account: scrooloose, }
+      - { name: vim-sensible, account: tpope, }
+      - { name: vim-javascript, account: pangloss, }
+      - { name: vim-python-pep8-indent, account: Vimjas, }

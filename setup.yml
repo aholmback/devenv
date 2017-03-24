@@ -7,92 +7,18 @@
       ansible_become_pass: password
       home: /home/{{ user }}
       tmpdir: "{{ home }}/tmp"
+      bindir: "{{ home }}/bin"
 
   tasks:
+      - include: tasks/distupgrade.yml
+      - include: tasks/ngrok.yml
+      - include: tasks/docker.yml
+      - include: tasks/node-essentials.yml
+      - include: tasks/pip.yml
+      - include: tasks/vim.yml
+      - include: tasks/git.yml
+      - include: tasks/ansible.yml
+      - include: tasks/build-tools.yml
+      - include: tasks/shell.yml
 
-      - name: "Upgrade system and download package list"
-        become: yes
-        apt:
-            update_cache: true
-            upgrade: dist
 
-      - name: "Install apt packages"
-        become: yes
-        apt: name={{ item }} state=latest
-        with_items:
-            - bash-completion
-            - vim
-            - git
-            - virtualenv
-            - build-essential
-            - python-dev
-            - python3-dev
-            - unzip
-            - npm
-            - nodejs-legacy
-            - libffi-dev # for building various packages with pip
-            - libpq-dev # for building pip's psycopg2
-
-      - name: "Ensure directories exist"
-        file: path={{ item }} state=directory
-        with_items:
-            - "{{ home }}/.vim/bundle"
-            - "{{ home }}/bin"
-            - "{{ home }}/projects"
-            - "{{ tmpdir }}"
-            - "{{ home }}/.ngrok2"
-
-      - name: "Download stuff"
-        get_url: url={{ item.url }} dest={{ item.dest }}
-        with_items:
-            - { url: "https://bootstrap.pypa.io/get-pip.py", dest: "{{ tmpdir }}/", }
-            - { url: "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip", dest: "{{ tmpdir }}/", }
-
-      - name: "Install pip"
-        become: yes
-        command: "/usr/bin/python {{ tmpdir }}/get-pip.py"
-
-      - name: "Install global pip packages"
-        become: yes
-        pip: name={{ item }}
-        with_items:
-            - ansible
-
-      - name: "Install npm packages"
-        become: yes
-        npm:
-            name: "{{ item }}"
-            global: yes
-            state: latest
-        with_items:
-            - "@frctl/fractal"
-            - "gulp-cli"
-
-      - name: "Install ngrok"
-        unarchive:
-            src: "{{ tmpdir }}/ngrok-stable-linux-amd64.zip"
-            dest: "{{ home }}/bin/"
-            remote_src: true
-
-      - name: "Copy configuration files"
-        template: src={{ item.src }} dest={{ item.dest }}
-        with_items:
-            - { src: conf/ngrok.yml, dest: "{{ home }}/.ngrok2", }
-            - { src: conf/.vimrc, dest: "{{ home }}/.vimrc", }
-            - { src: conf/.gitconfig, dest: "{{ home }}/.gitconfig", }
-
-      - name: "Install vim plugins"
-        git:
-            repo: https://github.com/{{ item.account }}/{{ item.name }}.git
-            dest: "{{ home }}/.vim/bundle/{{ item.name }}"
-        with_items:
-            - { name: vim-pathogen, account: tpope, }
-            - { name: nerdtree, account: scrooloose, }
-            - { name: vim-sensible, account: tpope, }
-            - { name: vim-javascript, account: pangloss, }
-
-      - name: "Copy id_rsa"
-        copy:
-            src: ~/.ssh/id_rsa
-            dest: "{{ home }}/.ssh/id_rsa"
-            mode: 0600

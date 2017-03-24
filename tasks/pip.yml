@@ -1,0 +1,21 @@
+---
+- name: "Ensure directories exists for ngrok"
+  file: path={{ item }} state=directory
+  with_items:
+      - "{{ tmpdir }}"
+
+- name: "Install apt packages"
+  become: yes
+  apt: name={{ item }} state=latest
+  with_items:
+      - virtualenv
+
+- name: "Download get-pip.py"
+  get_url: url={{ item.url }} dest={{ item.dest }}
+  with_items:
+    - { url: "https://bootstrap.pypa.io/get-pip.py", dest: "{{ tmpdir }}/", }
+
+- name: "Install pip"
+  become: yes
+  command: "/usr/bin/python {{ tmpdir }}/get-pip.py"
+

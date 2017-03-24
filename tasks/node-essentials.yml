@@ -1,0 +1,17 @@
+---
+- name: "Install node and npm"
+  become: yes
+  apt: name={{ item }} state=latest
+  with_items:
+    - npm
+    - nodejs-legacy
+
+- name: "Install essential npm packages"
+  become: yes
+  npm:
+      name: "{{ item }}"
+      global: yes
+      state: latest
+  with_items:
+      - "@frctl/fractal"
+      - "gulp-cli"
