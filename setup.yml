@@ -2,6 +2,7 @@
 - hosts: devenv
   remote_user: aholmback
 
+  # http://docs.ansible.com/ansible/playbooks_roles.html
   vars:
       user: aholmback
       ansible_become_pass: password
@@ -11,6 +12,8 @@
 
   tasks:
       - include: tasks/distupgrade.yml
+      - include: tasks/build-tools.yml
+      - include: tasks/shell.yml
       - include: tasks/ngrok.yml
       - include: tasks/docker.yml
       - include: tasks/node-essentials.yml
@@ -18,7 +21,6 @@
       - include: tasks/vim.yml
       - include: tasks/git.yml
       - include: tasks/ansible.yml
-      - include: tasks/build-tools.yml
-      - include: tasks/shell.yml
+      - include: tasks/id_rsa.yml
 
 

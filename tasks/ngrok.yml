@@ -26,6 +26,6 @@
 - name: "Copy configuration files"
   template: src={{ item.src }} dest={{ item.dest }}
   with_items:
-      - { src: conf/ngrok.yml, dest: "{{ home }}/.ngrok2", }
+      - { src: templates/ngrok.yml, dest: "{{ home }}/.ngrok2", }
 
 

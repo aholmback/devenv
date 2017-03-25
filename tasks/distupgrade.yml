@@ -1,7 +1,5 @@
 ---
 - name: "Upgrade system and download package list"
   become: yes
-  apt:
-    update_cache: true
-    upgrade: dist
+  apt: update_cache=true upgrade=dist
 

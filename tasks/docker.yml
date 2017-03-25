@@ -1,9 +1,18 @@
 ---
+# https://docs.docker.com/engine/installation/linux/ubuntu/#recommended-extra-packages-for-trusty-1404
 - name: "Install docker dependencies"
   become: yes
   apt: name={{ item }} state=latest
   with_items:
     - apt-transport-https
+    - linux-image-virtual
+
+# https://docs.docker.com/engine/installation/linux/ubuntu/#install-using-the-repository
+- name: "Add docker repository key"
+  become: yes
+  apt_key:
+      id: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
+      url: https://download.docker.com/linux/ubuntu/gpg
 
 - name: "Add docker repository"
   become: yes
@@ -11,18 +20,13 @@
     repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu yakkety stable"
     state: present
 
-- name: "Add docker repository key"
-  become: yes
-  apt_key:
-      id: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
-      url: https://download.docker.com/linux/ubuntu/gpg
-
 - name: "Install docker"
   become: yes
   apt: name={{ item }} state=latest
   with_items:
     - docker-ce
 
+# http://askubuntu.com/questions/477551/how-can-i-use-docker-without-sudo
 - name: "Add docker group"
   become: yes
   group:
@@ -40,6 +44,7 @@
   become: yes
   service: name=docker state=restarted
 
+# https://docs.docker.com/compose/install/
 - name: "Install docker-compose"
   get_url: url={{ item.url }} dest={{ item.dest }} mode=0755
   with_items:

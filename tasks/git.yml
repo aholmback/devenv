@@ -8,4 +8,4 @@
 - name: "Configure git"
   template: src={{ item.src }} dest={{ item.dest }}
   with_items:
-    - { src: conf/.gitconfig, dest: "{{ home }}/.gitconfig", }
+    - { src: templates/.gitconfig, dest: "{{ home }}/.gitconfig", }
