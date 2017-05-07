@@ -25,3 +25,4 @@
       - { name: vim-sensible, account: tpope, }
       - { name: vim-javascript, account: pangloss, }
       - { name: vim-python-pep8-indent, account: Vimjas, }
+      - { name: vim-mustache-handlebars, account: mustache, }

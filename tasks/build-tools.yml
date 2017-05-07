@@ -4,9 +4,12 @@
   apt: name={{ item }} state=latest
   with_items:
     - build-essential
+    - libssl-dev
     - python-dev
     - python3-dev
     - libffi-dev
     - libpq-dev
+    - libjpeg9-dev
+    - zlib1g-dev
 
 

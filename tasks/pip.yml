@@ -1,9 +1,4 @@
 ---
-- name: "Ensure directories exists for ngrok"
-  file: path={{ item }} state=directory
-  with_items:
-      - "{{ tmpdir }}"
-
 - name: "Install apt packages"
   become: yes
   apt: name={{ item }} state=latest

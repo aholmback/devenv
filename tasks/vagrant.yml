@@ -1,0 +1,7 @@
+- name: "Install vagrant"
+  become: yes
+  apt: name={{ item }} state=latest
+  with_items:
+    - virtualbox
+    - vagrant
+

@@ -5,3 +5,5 @@
   apt: name={{ item }} state=latest
   with_items:
     - bash-completion
+    - socat
+    - man

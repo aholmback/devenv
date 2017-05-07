@@ -5,27 +5,14 @@
   with_items:
       - unzip
 
-- name: "Ensure directories exists for ngrok"
-  file: path={{ item }} state=directory
-  with_items:
-      - "{{ home }}/bin"
-      - "{{ tmpdir }}"
-      - "{{ home }}/.ngrok2"
-
-- name: "Download ngrok"
-  get_url: url={{ item.url }} dest={{ item.dest }}
-  with_items:
-    - { url: "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip", dest: "{{ tmpdir }}/", }
-
 - name: "Install ngrok"
+  become: yes
   unarchive:
-      src: "{{ tmpdir }}/ngrok-stable-linux-amd64.zip"
-      dest: "{{ bindir }}"
+      src: "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip"
+      dest: /usr/local/bin/
       remote_src: yes
 
-- name: "Copy configuration files"
-  template: src={{ item.src }} dest={{ item.dest }}
-  with_items:
-      - { src: templates/ngrok.yml, dest: "{{ home }}/.ngrok2", }
+- name: "Install ngrok authtoken"
+  command: /usr/local/bin/ngrok authtoken YYU3TGTkWmhcK6JgaC8w_28kWUHCTMvcBUeTdxPZHC
 
 

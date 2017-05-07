@@ -1,10 +1,21 @@
 ---
+
 - name: "Install node and npm"
   become: yes
-  apt: name={{ item }} state=latest
+  unarchive:
+    src: "https://nodejs.org/dist/v7.8.0/node-v7.8.0-linux-x64.tar.xz"
+    dest: "/opt/"
+    remote_src: yes
+
+- name: "Link node and npm"
+  become: yes
+  file:
+    src: /opt/node-v7.8.0-linux-x64/bin/{{ item }}
+    dest: /usr/local/bin/{{ item }}
+    state: link
   with_items:
+    - node
     - npm
-    - nodejs-legacy
 
 - name: "Install essential npm packages"
   become: yes
@@ -15,3 +26,17 @@
   with_items:
       - "@frctl/fractal"
       - "gulp-cli"
+      - "grunt-cli"
+      - "bower"
+
+- name: "Link installed npm package binaries"
+  become: yes
+  file:
+    src: /opt/node-v7.8.0-linux-x64/lib/node_modules/{{ item.src }}
+    dest: /usr/local/bin/{{ item.dest }}
+    state: link
+  with_items:
+    - { src: "@frctl/fractal/bin/fractal", dest: fractal }
+    - { src: gulp-cli/bin/gulp.js, dest: gulp }
+    - { src: grunt-cli/bin/grunt, dest: grunt }
+    - { src: bower/bin/bower, dest: bower }
