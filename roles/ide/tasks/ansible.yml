@@ -1,5 +1,4 @@
 ---
-
 - name: "Install ansible"
   become: yes
   pip: name={{ item }}

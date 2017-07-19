@@ -1,6 +1,5 @@
 ---
-- hosts: devenv
-  remote_user: aholmback
+- hosts: dev
 
   # http://docs.ansible.com/ansible/playbooks_roles.html
   vars:
@@ -10,18 +9,5 @@
       tmpdir: "{{ home }}/tmp"
       bindir: "{{ home }}/bin"
 
-  tasks:
-      - include: tasks/ansible.yml
-      - include: tasks/distupgrade.yml
-      - include: tasks/build-tools.yml
-      - include: tasks/shell.yml
-      - include: tasks/ngrok.yml
-      - include: tasks/docker.yml
-      - include: tasks/vagrant.yml
-      - include: tasks/node-essentials.yml
-      - include: tasks/pip.yml
-      - include: tasks/vim.yml
-      - include: tasks/git.yml
-      - include: tasks/id_rsa.yml
-
-
+  roles:
+      - ide

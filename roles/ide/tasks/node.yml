@@ -1,0 +1,5 @@
+---
+- name: Install node
+  become: yes
+  include_role:
+    name: geerlingguy.nodejs

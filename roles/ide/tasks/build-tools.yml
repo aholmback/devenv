@@ -9,7 +9,6 @@
     - python3-dev
     - libffi-dev
     - libpq-dev
-    - libjpeg9-dev
     - zlib1g-dev
 
 

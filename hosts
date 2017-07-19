@@ -1,3 +1,5 @@
-[devenv]
-#172.16.131.132
-192.168.0.120
+[dev]
+172.16.131.130
+
+[dev:vars]
+ansible_python_interpreter=/usr/bin/python3

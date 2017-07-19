@@ -1,11 +1,10 @@
 ---
-- name: "Install git packages"
+- name: Install git
   become: yes
-  apt: name={{ item }} state=latest
-  with_items:
-    - git
+  include_role:
+    name: geerlingguy.git
 
-- name: "Configure git"
+- name: Configure git
   template: src={{ item.src }} dest={{ item.dest }}
   with_items:
     - { src: templates/.gitconfig, dest: "{{ home }}/.gitconfig", }

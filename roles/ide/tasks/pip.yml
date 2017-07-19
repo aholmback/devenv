@@ -1,0 +1,7 @@
+---
+- name: Install pip
+  become: yes
+  include_role:
+    name: ScorpionResponse.pip
+  vars:
+    use_python3: yes

@@ -1,0 +1,11 @@
+- include: distupgrade.yml
+- include: build-tools.yml
+- include: pip.yml
+- include: ansible.yml
+- include: shell.yml
+- include: ngrok.yml
+- include: git.yml
+- include: vim.yml
+- include: screen.yml
+- include: node.yml
+- include: id_rsa.yml
