@@ -3,6 +3,7 @@ execute pathogen#infect()
 call pathogen#helptags()
 
 :inoremap jk <esc>
+:colorscheme torte
 set relativenumber number
 filetype indent on
 set tabstop=8 expandtab shiftwidth=4 softtabstop=4

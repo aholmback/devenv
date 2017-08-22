@@ -3,26 +3,23 @@
   become: yes
   apt: name={{ item }} state=latest
   with_items:
-    - vim
+    - neovim
 
 - name: "Ensure directories exists for vim"
   file: path={{ item }} state=directory
   with_items:
-    - "{{ home }}/.vim/bundle"
+    - "{{ home }}/.config/nvim/bundle"
 
 - name: "Configure vim"
   template: src={{ item.src }} dest={{ item.dest }}
   with_items:
-      - { src: templates/.vimrc, dest: "{{ home }}/.vimrc", }
+      - { src: templates/init.vim, dest: "{{ home }}/.config/nvim/init.vim", }
 
 - name: "Install vim plugins"
   git:
       repo: https://github.com/{{ item.account }}/{{ item.name }}.git
-      dest: "{{ home }}/.vim/bundle/{{ item.name }}"
+      dest: "{{ home }}/.config/nvim//bundle/{{ item.name }}"
   with_items:
       - { name: vim-pathogen, account: tpope, }
       - { name: nerdtree, account: scrooloose, }
-      - { name: vim-sensible, account: tpope, }
-      - { name: vim-javascript, account: pangloss, }
-      - { name: vim-python-pep8-indent, account: Vimjas, }
-      - { name: vim-mustache-handlebars, account: mustache, }
+      - { name: vim-vue, account: posva, }
