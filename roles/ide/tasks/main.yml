@@ -1,11 +1,96 @@
-- include: distupgrade.yml
-- include: build-tools.yml
-- include: pip.yml
-- include: ansible.yml
-- include: shell.yml
-- include: ngrok.yml
-- include: git.yml
-- include: vim.yml
-- include: screen.yml
-- include: node.yml
-- include: id_rsa.yml
+---
+
+- name: Update system
+  become: yes
+  apt:
+    update_cache: true
+    upgrade: dist
+
+- name: Update/install debian packages
+  become: yes
+  apt:
+    pkg: "{{item}}"
+    state: latest
+  with_items:
+    - build-essential
+    - libssl-dev
+    - python3-dev
+    - libffi-dev
+    - libpq-dev
+    - zlib1g-dev
+    - bash-completion
+    - less
+    - ca-certificates
+    - vim
+    - git
+    - unzip
+    - screen
+    - python-pip
+    - silversearcher-ag
+
+- name: Update/install global pip packages
+  become: yes
+  pip:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - virtualenv
+    - flake8
+    - ansible
+
+- name: Configure git
+  template:
+    src: .gitconfig
+    dest: "{{ home }}/.gitconfig"
+
+- name: Create directory for vim plugins
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ home }}/.vim/bundle"
+
+- name: Configure vim
+  template:
+    src: vimrc
+    dest: "{{ home }}/.vim/"
+
+- name: Install vim plugins
+  git:
+      repo: https://github.com/{{ item.account }}/{{ item.name }}.git
+      dest: "{{ home }}/.vim/bundle/{{ item.name }}"
+  with_items:
+      - { name: vim-pathogen, account: tpope, }
+      - { name: ale, account: w0rp, }
+      - { name: nerdtree, account: scrooloose, }
+      - { name: ack.vim, account: mileszs, }
+      - { name: jedi-vim, account: davidhalter, }
+      - { name: vim-colorschemes, account: flazz, }
+
+- name: Install ngrok
+  become: yes
+  unarchive:
+      src: "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip"
+      dest: /usr/local/bin/
+      remote_src: yes
+
+- name: Install ngrok authtoken
+  command: /usr/local/bin/ngrok authtoken YYU3TGTkWmhcK6JgaC8w_28kWUHCTMvcBUeTdxPZHC
+
+- name: Create/verify ~/.ssh
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+      - "{{ home }}/.ssh"
+
+- name: Copy id_rsa
+  copy:
+    src: ~/.ssh/id_rsa
+    dest: "{{ home }}/.ssh/id_rsa"
+    mode: 0600
+
+- name: Install node
+  become: yes
+  include_role:
+    name: geerlingguy.nodejs

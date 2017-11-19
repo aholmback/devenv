@@ -1,0 +1,26 @@
+runtime bundle/vim-pathogen/autoload/pathogen.vim
+execute pathogen#infect()
+call pathogen#helptags()
+
+:inoremap jk <esc>
+set relativenumber number ruler
+filetype indent on
+syntax on
+set tabstop=8 expandtab shiftwidth=4 softtabstop=4
+colorscheme elflord
+
+autocmd FileType css setlocal shiftwidth=2 tabstop=2
+autocmd FileType html.handlebars setlocal shiftwidth=2 tabstop=2
+autocmd FileType html setlocal shiftwidth=2 tabstop=2
+autocmd FileType javascript setlocal shiftwidth=2 tabstop=2
+
+if executable('ag')
+    let g:ackprg = 'ag --vimgrep'
+endif
+
+" https://github.com/w0rp/ale#usage-linting
+let g:airline#extensions#ale#enabled = 1
+nmap <silent> <C-k> <Plug>(ale_previous_wrap)
+nmap <silent> <C-j> <Plug>(ale_next_wrap)
+nmap ,n :NERDTreeFind<CR>
+let NERDTreeShowHidden=1

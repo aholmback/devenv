@@ -1,0 +1,4 @@
+---
+- hosts: devenv
+  roles:
+    - ide
