@@ -14,6 +14,9 @@ autocmd FileType html.handlebars setlocal shiftwidth=2 tabstop=2
 autocmd FileType html setlocal shiftwidth=2 tabstop=2
 autocmd FileType javascript setlocal shiftwidth=2 tabstop=2
 
+set nobackup
+set nowritebackup
+
 if executable('ag')
     let g:ackprg = 'ag --vimgrep'
 endif
