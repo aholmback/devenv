@@ -66,6 +66,7 @@
       - { name: ack.vim, account: mileszs, }
       - { name: jedi-vim, account: davidhalter, }
       - { name: vim-colorschemes, account: flazz, }
+      - { name: vim-javascript, account: pangloss, }
       - { name: vim-mustache-handlebars, account: mustache, }
 
 - name: Install ngrok
