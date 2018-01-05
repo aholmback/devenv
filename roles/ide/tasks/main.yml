@@ -1,4 +1,27 @@
 ---
+- name: Make sure stuff that needs to be present later is present now
+  become: yes
+  apt:
+    pkg: "{{item}}"
+    state: present
+  with_items:
+    - apt-transport-https
+
+- name: Add Nodesource apt key.
+  become: yes
+  apt_key:
+    url: https://keyserver.ubuntu.com/pks/lookup?op=get&fingerprint=on&search=0x1655A0AB68576280
+    id: "68576280"
+    state: present
+
+- name: Add NodeSource repositories for Node.js {{ ansible_distribution_release }}.
+  become: yes
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  with_items:
+    - "deb https://deb.nodesource.com/node_9.x {{ ansible_distribution_release }} main"
+    - "deb-src https://deb.nodesource.com/node_9.x {{ ansible_distribution_release }} main"
 
 - name: Update system
   become: yes
@@ -27,6 +50,7 @@
     - screen
     - python-pip
     - silversearcher-ag
+    - nodejs
 
 - name: Update/install global pip packages
   become: yes
@@ -60,14 +84,15 @@
       repo: https://github.com/{{ item.account }}/{{ item.name }}.git
       dest: "{{ home }}/.vim/bundle/{{ item.name }}"
   with_items:
-      - { name: vim-pathogen, account: tpope, }
-      - { name: ale, account: w0rp, }
-      - { name: nerdtree, account: scrooloose, }
-      - { name: ack.vim, account: mileszs, }
-      - { name: jedi-vim, account: davidhalter, }
-      - { name: vim-colorschemes, account: flazz, }
-      - { name: vim-javascript, account: pangloss, }
-      - { name: vim-mustache-handlebars, account: mustache, }
+      - { name: vim-pathogen, account: tpope }
+      - { name: nerdtree, account: scrooloose }
+      - { name: ctrlp.vim, account: kien }
+      - { name: ale, account: w0rp }
+      - { name: ack.vim, account: mileszs }
+      - { name: jedi-vim, account: davidhalter }
+      - { name: vim-colorschemes, account: flazz }
+      - { name: vim-javascript, account: pangloss }
+      - { name: vim-mustache-handlebars, account: mustache }
 
 - name: Install ngrok
   become: yes
@@ -91,8 +116,3 @@
     src: ~/.ssh/id_rsa
     dest: "{{ home }}/.ssh/id_rsa"
     mode: 0600
-
-- name: Install node
-  become: yes
-  include_role:
-    name: geerlingguy.nodejs
