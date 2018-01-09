@@ -6,6 +6,23 @@
     state: present
   with_items:
     - apt-transport-https
+    - ca-certificates
+
+- name: Add Docker apt key.
+  become: yes
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+    state: present
+  register: add_repository_key
+  ignore_errors: true
+
+- name: Add Docker repository.
+  become: yes
+  apt_repository:
+    repo: "{{ docker_apt_repository }}"
+    state: present
+    update_cache: yes
 
 - name: Add Nodesource apt key.
   become: yes
@@ -43,7 +60,6 @@
     - zlib1g-dev
     - bash-completion
     - less
-    - ca-certificates
     - vim
     - git
     - unzip
@@ -51,6 +67,18 @@
     - python-pip
     - silversearcher-ag
     - nodejs
+    - docker-ce
+    - postgresql-client
+
+- name: Update/install global node packages
+  become: yes
+  npm:
+    name: "{{ item }}"
+    global: yes
+    state: latest
+  with_items:
+    - pm2
+    - "@frctl/fractal"
 
 - name: Update/install global pip packages
   become: yes
@@ -59,13 +87,17 @@
     state: latest
   with_items:
     - virtualenv
-    - flake8
     - ansible
 
 - name: Configure git
   template:
     src: .gitconfig
     dest: "{{ home }}/.gitconfig"
+
+- name: Configure bash
+  template:
+    src: .bash_profile
+    dest: "{{ home }}/.bash_profile"
 
 - name: Create directory for vim plugins
   file:
@@ -89,7 +121,6 @@
       - { name: ctrlp.vim, account: kien }
       - { name: ale, account: w0rp }
       - { name: ack.vim, account: mileszs }
-      - { name: jedi-vim, account: davidhalter }
       - { name: vim-colorschemes, account: flazz }
       - { name: vim-javascript, account: pangloss }
       - { name: vim-mustache-handlebars, account: mustache }
