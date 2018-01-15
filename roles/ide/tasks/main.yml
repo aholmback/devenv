@@ -1,44 +1,40 @@
 ---
-- name: Make sure stuff that needs to be present later is present now
+- name: Set authorized key took from file
   become: yes
-  apt:
-    pkg: "{{item}}"
+  become_user: "{{ item }}"
+  authorized_key:
+    user: "{{ item }}"
     state: present
+    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
   with_items:
-    - apt-transport-https
-    - ca-certificates
+    - alex
+    - root
 
-- name: Add Docker apt key.
+- name: Set root password (aszf1umA2bauJ5Ju552mF4rRMmhAyz5X)
   become: yes
-  apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
-    state: present
-  register: add_repository_key
-  ignore_errors: true
+  user:
+    name: root
+    password: $6$YZ7Tz6F2oS.rmK$gOUGxCz2l2sDEbazss9L8lnKBwoKkKfNkU6AWSzFNlZPhiSGEmvoEVT3vSOM0Nf/GbKMn7fzJDf/agu3VPRG61
 
-- name: Add Docker repository.
+- name: Copy sshd_config
   become: yes
-  apt_repository:
-    repo: "{{ docker_apt_repository }}"
-    state: present
-    update_cache: yes
+  copy:
+    src: sshd_config
+    dest: /etc/ssh/sshd_config
 
-- name: Add Nodesource apt key.
-  become: yes
-  apt_key:
-    url: https://keyserver.ubuntu.com/pks/lookup?op=get&fingerprint=on&search=0x1655A0AB68576280
-    id: "68576280"
-    state: present
+- name: Copy ssh-keys
+  copy:
+    src: ~/.ssh/id_rsa
+    dest: "{{ home }}/.ssh/"
+    mode: 0600
 
-- name: Add NodeSource repositories for Node.js {{ ansible_distribution_release }}.
+- name: Add backports
   become: yes
   apt_repository:
     repo: "{{ item }}"
     state: present
   with_items:
-    - "deb https://deb.nodesource.com/node_9.x {{ ansible_distribution_release }} main"
-    - "deb-src https://deb.nodesource.com/node_9.x {{ ansible_distribution_release }} main"
+    - "deb http://ftp.debian.org/debian stretch-backports main"
 
 - name: Update system
   become: yes
@@ -51,34 +47,18 @@
   apt:
     pkg: "{{item}}"
     state: latest
+    default_release: stretch-backports
   with_items:
-    - build-essential
-    - libssl-dev
-    - python3-dev
-    - libffi-dev
-    - libpq-dev
-    - zlib1g-dev
     - bash-completion
     - less
     - vim
     - git
     - unzip
-    - screen
+    - tmux
+    - ncdu
+    - python
     - python-pip
     - silversearcher-ag
-    - nodejs
-    - docker-ce
-    - postgresql-client
-
-- name: Update/install global node packages
-  become: yes
-  npm:
-    name: "{{ item }}"
-    global: yes
-    state: latest
-  with_items:
-    - pm2
-    - "@frctl/fractal"
 
 - name: Update/install global pip packages
   become: yes
@@ -86,7 +66,6 @@
     name: "{{ item }}"
     state: latest
   with_items:
-    - virtualenv
     - ansible
 
 - name: Configure git
@@ -142,8 +121,3 @@
   with_items:
       - "{{ home }}/.ssh"
 
-- name: Copy id_rsa
-  copy:
-    src: ~/.ssh/id_rsa
-    dest: "{{ home }}/.ssh/id_rsa"
-    mode: 0600
